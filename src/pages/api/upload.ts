@@ -18,6 +18,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const s3Params = {
     Bucket: process.env.S3_BUCKET_NAME,
     Key,
+    Expires: 60,
     ContentType: `text/${extension}`,
   };
 
