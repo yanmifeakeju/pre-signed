@@ -13,7 +13,11 @@ const s3 = new S3({
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const timestamps = Date.parse(new Date().toISOString());
   const extension = (req.query.fileType as string).split('/')[1];
-  const Key = `${timestamps}.${extension}`;
+
+  const uploadOption = req.query.uploadOption as string;
+  const Key = `${uploadOption}.${timestamps}.${extension}`;
+
+  console.log(Key);
 
   const s3Params = {
     Bucket: process.env.S3_BUCKET_NAME,
@@ -24,5 +28,5 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
   const uploadUrl = s3.getSignedUrl('putObject', s3Params);
 
-  res.status(200).json({ uploadUrl, Key });
+  res.status(200).json({ uploadUrl: uploadUrl, Key });
 }

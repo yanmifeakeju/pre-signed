@@ -1,16 +1,21 @@
-import axios from "axios";
-import { ChangeEvent } from "react";
-import styled from "styled-components";
+import axios from 'axios';
+import { ChangeEvent } from 'react';
+import styled from 'styled-components';
 
 async function uploadToS3(e: ChangeEvent<HTMLFormElement>) {
   const formData = new FormData(e.target);
-  const file = formData.get("file");
 
-  if (!file) return null;
+  const file = formData.get('filename') as File;
+  const uploadOption = formData.get('uploadOption');
+
+  if (!file || file.name === '') return null;
 
   //@ts-ignore
   const fileType = encodeURIComponent(file.type);
-  const { data } = await axios.get(`/api/upload?fileType=${fileType}`);
+
+  const { data } = await axios.get(
+    `/api/upload?fileType=${fileType}&uploadOption=${uploadOption}`
+  );
 
   const { uploadUrl, Key } = data;
 
@@ -25,33 +30,37 @@ export default function Upload() {
 
     const key = await uploadToS3(e);
     console.log(key);
+
+    return key;
   }
 
   return (
     <Container>
-      <div className="wrapper">
-        <form onSubmit={handleSubmit} className="input-wrap">
+      <div className='wrapper'>
+        <form onSubmit={handleSubmit} className='input-wrap'>
           <p>Please select file to upload:</p>
           <SelectWrap>
-            <select>
-              <option defaultValue={0}>Select option:</option>
-              <option value="1">Sanction</option>
-              <option value="2">Proliferation Financing</option>
-              <option value="3">Watchlisted BVN</option>
-              <option value="4">Fraudsters</option>
-              <option value="5">PEP</option>
+            <select name='uploadOption'>
+              <option defaultValue={0} disabled>
+                Select option:
+              </option>
+              <option value='sanction'>Sanction</option>
+              <option value='proliferation'>Proliferation Financing</option>
+              <option value='watchlisted'>Watchlisted BVN</option>
+              <option value='fraudsters'>Fraudsters</option>
+              <option value='pep'>PEP</option>
             </select>
           </SelectWrap>
           <UploadBtnWrap>
             <input
-              type="file"
-              id="myFile"
-              name="filename"
-              className="file-upload"
+              type='file'
+              id='myFile'
+              name='filename'
+              className='file-upload'
             />
           </UploadBtnWrap>
 
-          <button type="submit">Submit</button>
+          <button type='submit'>Submit</button>
         </form>
       </div>
     </Container>
@@ -59,7 +68,7 @@ export default function Upload() {
 }
 
 const Container = styled.div`
-  font-family: "Roboto", sans-serif;
+  font-family: 'Roboto', sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
